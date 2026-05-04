@@ -72,7 +72,7 @@
       const data = await res.json();
       if (!data.exists) return toast("Комната не найдена");
       state.code = code;
-      state.pid = "";
+      // Не сбрасываем pid: если это тот же игрок, сервер подхватит его бывший слот.
       $("#game-code").textContent = code;
       $("#game-level").textContent = "Уровень: " + (LEVEL_NAME[data.level] || "—");
       showScreen("screen-game");

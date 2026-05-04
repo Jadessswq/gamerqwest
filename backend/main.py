@@ -241,10 +241,12 @@ async def create_room(payload: dict[str, Any] | None = None) -> dict[str, str]:
         level = payload["level"]
     code = gen_room_code()
     # Случайные пороги перехода между скрытыми тирами:
-    #   1-я подгруппа (прелюдии): 7-10 ходов
-    #   2-я подгруппа (средние):  ещё 5-10 ходов
-    t1_end = random.randint(7, 10)
-    t2_end = t1_end + random.randint(5, 10)
+    #   1-я подгруппа (прелюдии): 4-6 ходов
+    #   горячие начинаются с хода 9-12
+    t1_end = random.randint(4, 6)
+    t2_end = random.randint(9, 12)
+    if t2_end <= t1_end:
+        t2_end = t1_end + 3
     ROOMS[code] = Room(code=code, level=level, t1_end=t1_end, t2_end=t2_end)
     return {"code": code, "level": level}
 
@@ -294,7 +296,23 @@ async def ws_room(ws: WebSocket, code: str) -> None:
         pid = msg.get("pid") or ""
 
         async with room.lock:
-            existing = next((p for p in room.players if p.pid == pid), None)
+            # 1) Точное совпадение по pid — это тот же игрок вернулся.
+            existing = next((p for p in room.players if p.pid == pid), None) if pid else None
+            # 2) Если pid не совпал, но кто-то из слотов отключён —
+            #    пробуем подобрать слот по совпадению имени, иначе
+            #    (если в комнате есть вообще отключённый слот и она полна)
+            #    отдаём его пришедшему — он явно возвращается в игру.
+            if existing is None:
+                by_name = next(
+                    (p for p in room.players if not p.connected and name and p.name == name),
+                    None,
+                )
+                if by_name is not None:
+                    existing = by_name
+                elif len(room.players) >= 2:
+                    disconnected = next((p for p in room.players if not p.connected), None)
+                    if disconnected is not None:
+                        existing = disconnected
             if existing is not None:
                 existing.ws = ws
                 existing.connected = True
@@ -452,8 +470,10 @@ async def handle_message(room: Room, player: Player, msg: dict[str, Any]) -> Non
             _reset_turn_state(room)
             room.used = {lvl: {"truth": [], "dare": []} for lvl in QUESTIONS}
             room.turn_index = 0
-            room.t1_end = random.randint(7, 10)
-            room.t2_end = room.t1_end + random.randint(5, 10)
+            room.t1_end = random.randint(4, 6)
+            room.t2_end = random.randint(9, 12)
+            if room.t2_end <= room.t1_end:
+                room.t2_end = room.t1_end + 3
             for p in room.players:
                 p.score_done = 0
                 p.score_refused = 0
