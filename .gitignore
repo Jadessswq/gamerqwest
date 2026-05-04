@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Build / deploy artefacts
+*.log
+qr.png
+fly.toml
+Dockerfile
+
+# Локальные дев-тесты, бьющие в production-URL
+test_remote.py

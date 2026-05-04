@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#16121f" />
+<title>Правда или Действие 18+</title>
+<link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<div id="app">
+  <!-- Главное меню -->
+  <section id="screen-menu" class="screen active">
+    <div class="logo">
+      <div class="logo-emoji">❤️‍🔥</div>
+      <h1>Правда или Действие</h1>
+      <div class="badge">18+ · для двоих · онлайн</div>
+    </div>
+
+    <label class="field">
+      <span>Твоё имя</span>
+      <input id="input-name" type="text" placeholder="Например, Аня" maxlength="20" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span>Уровень игры</span>
+      <select id="select-level-create" aria-label="Уровень">
+        <option value="soft">Лёгкий флирт</option>
+        <option value="medium" selected>Средний 18+</option>
+        <option value="hot">Hard 18+</option>
+      </select>
+    </label>
+
+    <button id="btn-create" class="primary">Создать комнату</button>
+
+    <div class="divider"><span>или</span></div>
+
+    <label class="field">
+      <span>Код комнаты партнёра</span>
+      <input id="input-code" type="text" placeholder="ABC123" maxlength="6" autocomplete="off" inputmode="latin" />
+    </label>
+    <button id="btn-join" class="secondary">Присоединиться</button>
+
+    <p class="hint">Создаёт один — отправляет код второму. Уровень фиксируется тем, кто создал комнату, и одинаков для обоих.</p>
+  </section>
+
+  <!-- Лобби: ждём второго игрока -->
+  <section id="screen-lobby" class="screen">
+    <h2>Комната создана</h2>
+    <div class="room-code" id="lobby-code">------</div>
+    <div class="lobby-level">Уровень: <b id="lobby-level">—</b></div>
+    <button id="btn-copy-code" class="ghost">Скопировать код</button>
+    <button id="btn-share-link" class="ghost">Поделиться ссылкой</button>
+    <p class="status" id="lobby-status">Ожидаем второго игрока…</p>
+    <button id="btn-leave-lobby" class="link">Выйти</button>
+  </section>
+
+  <!-- Игровой экран -->
+  <section id="screen-game" class="screen">
+    <div class="topbar">
+      <div class="room-mini">Комната <b id="game-code">------</b></div>
+      <div class="level-mini" id="game-level">Уровень: —</div>
+    </div>
+
+    <div class="players">
+      <div class="player" id="player-me">
+        <div class="player-name">—</div>
+        <div class="player-stats"><span class="ok">0</span> / <span class="bad">0</span></div>
+      </div>
+      <div class="vs">vs</div>
+      <div class="player" id="player-them">
+        <div class="player-name">—</div>
+        <div class="player-stats"><span class="ok">0</span> / <span class="bad">0</span></div>
+      </div>
+    </div>
+
+    <div class="turn-indicator" id="turn-indicator">Ход …</div>
+
+    <!-- Фаза: выбор Правда/Действие -->
+    <div id="phase-choosing" class="phase">
+      <div class="card choose-card">
+        <p class="prompt" id="choose-prompt">Что выбираешь?</p>
+        <div class="choose-buttons">
+          <button id="btn-truth" class="big truth">Правда</button>
+          <button id="btn-dare" class="big dare">Действие</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Фаза: показ вопроса/задания -->
+    <div id="phase-showing" class="phase">
+      <div class="card question-card">
+        <div class="kind-label" id="kind-label">Правда</div>
+        <p class="question-text" id="question-text">…</p>
+        <div class="action-buttons" id="my-actions">
+          <button id="btn-complete" class="big done">Выполнить ✓</button>
+          <button id="btn-refuse" class="big refuse">Отказаться ✕</button>
+          <button id="btn-switch" class="big switch">Переключиться</button>
+        </div>
+        <div class="waiting-note" id="waiting-note">Ждём, пока партнёр выполнит / откажется…</div>
+      </div>
+    </div>
+
+    <div class="event-log" id="event-log"></div>
+
+    <button id="btn-reset" class="ghost small">Сбросить игру</button>
+  </section>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
